@@ -28,68 +28,6 @@ namespace Parental_Control.Controllers
                         View(await _context.Users.ToListAsync()) :
                         Problem("Entity set 'Parental_ControlContext.Users'  is null.");
         }
-        public Boolean checkLogin()
-        {
-            string userId = HttpContext.Session.GetString("userId");
-            string userName = HttpContext.Session.GetString("username");
-            if (userId != null && userName != null)
-            {
-                var User = _context.Users
-                .Where(users => users.id == Int32.Parse(userId))
-                .Where(users => users.username == userName).FirstOrDefault();
-                if (User.logged_in == 1)
-                {
-                    return true;
-                }
-                else
-                {
-                    logout();
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        public IActionResult login(String username,String password)
-        {
-
-            bool isLoggedIn = checkLogin();
-            ViewBag.isAuth = isLoggedIn;
-            ViewBag.userId = HttpContext.Session.GetString("userId");
-            ViewBag.userName = HttpContext.Session.GetString("username");
-            if (username != null && password != null && isLoggedIn != true)
-            {
-                var User = _context.Users
-                     .Where(users => users.username == username)
-                     .Where(users => users.password == password).FirstOrDefault();
-                if (User != null)
-                {
-                    HttpContext.Session.SetString("userId", User.id.ToString());
-                    HttpContext.Session.SetString("username", User.username);
-                    User.logged_in = 1;
-                    _context.SaveChanges();
-                    return RedirectToAction("login", "Users");
-                }
-            }
-            return View();
-        }
-
-        public IActionResult logout() {
-            string userId = HttpContext.Session.GetString("userId");
-            string username = HttpContext.Session.GetString("username");
-            if (username != null && userId != null)
-            {
-                var User = _context.Users
-             .Where(users => users.id == Int32.Parse(userId))
-             .Where(users => users.username == username).FirstOrDefault();
-                User.logged_in = 0;
-                _context.SaveChanges();
-            }
-            HttpContext.Session.Clear();
-                return RedirectToAction("login","Users");
-        }
 
         // GET: Users1/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -120,7 +58,7 @@ namespace Parental_Control.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,username,password,logged_in")] Users users)
+        public async Task<IActionResult> Create([Bind("id,username,password")] Users users)
         {
             if (ModelState.IsValid)
             {

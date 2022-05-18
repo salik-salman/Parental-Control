@@ -12,9 +12,13 @@ namespace Parental_Control.Controllers
         {
             _logger = logger;
         }
-
         public IActionResult Index()
         {
+            if (TempData["MSG"] != null)
+            {
+                ViewBag.StatusMsg = TempData["MSG"].ToString();
+                ViewBag.msgType = TempData["MSG_Type"].ToString();
+            }
             return View();
         }
 

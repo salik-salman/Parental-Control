@@ -12,6 +12,6 @@ namespace Parental_Control.Models
         public int id { get; set; }
         public string username { get; set; }
         public string password { get; set; }
-        public int logged_in { get; set; }
+        public int? logged_in { get; set; } = 0;
     }
 }
