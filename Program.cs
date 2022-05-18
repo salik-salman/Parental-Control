@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Parental_Control.Data;
+using Parental_Control.Middlwares;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<Parental_ControlContext>(options =>
@@ -32,7 +33,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
+app.UseMiddleware();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

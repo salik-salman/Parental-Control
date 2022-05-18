@@ -15,7 +15,6 @@ namespace Parental_Control.Controllers
     public class AuthController : Controller
     {
         public readonly Parental_ControlContext _context;
-
         public AuthController(Parental_ControlContext context)
         {
             _context = context;
@@ -24,6 +23,12 @@ namespace Parental_Control.Controllers
         {
             if (checkLogin() != true)
             {
+                bool keyExists = HttpContext.Items.ContainsKey("Status");
+                    if (keyExists == true)
+                    {
+                    ViewBag.StatusMsg = this.HttpContext.Items["Status"].ToString();
+                    ViewBag.msgType = "danger";
+                }
                 return View();
             }
             else
@@ -35,8 +40,15 @@ namespace Parental_Control.Controllers
         }
         public Boolean checkLogin()
         {
-            string userId = HttpContext.Session.GetString("userId");
-            string userName = HttpContext.Session.GetString("username");
+            string userId = null;
+            string userName = null;
+            try
+            {
+                userId = HttpContext.Session.GetString("userId");
+                userName = HttpContext.Session.GetString("username");
+            }
+            catch (NullReferenceException e)
+            {}
             if (userId != null && userName != null)
             {
                 var User = _context.Users
@@ -64,7 +76,6 @@ namespace Parental_Control.Controllers
         {
 
             bool isLoggedIn = checkLogin();
-            ViewBag.isAuth = isLoggedIn;
             ViewBag.userId = HttpContext.Session.GetString("userId");
             ViewBag.userName = HttpContext.Session.GetString("username");
             if (username != null && password != null && isLoggedIn != true)
@@ -95,8 +106,11 @@ namespace Parental_Control.Controllers
                 var User = _context.Users
              .Where(users => users.id == Int32.Parse(userId))
              .Where(users => users.username == username).FirstOrDefault();
-                User.logged_in = 0;
-                _context.SaveChanges();
+                if (User != null)
+                {
+                    User.logged_in = 0;
+                    _context.SaveChanges();
+                }
             }
             HttpContext.Session.Clear();
             return RedirectToAction("", "Home");
